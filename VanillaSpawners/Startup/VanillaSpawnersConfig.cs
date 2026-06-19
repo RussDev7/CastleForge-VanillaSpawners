@@ -9,6 +9,7 @@ using System.Globalization;
 using System.IO;
 using System;
 
+using static VanillaSpawners.GamePatches;
 using static ModLoader.LogSystem;
 
 namespace VanillaSpawners
@@ -76,6 +77,9 @@ namespace VanillaSpawners
         // Logs each blocked spawner activation check.
         public bool LogBlockedActivation = false;
 
+        // Hotkey to reload this config at runtime.
+        public string ReloadConfigHotkey = "Ctrl+Shift+R";
+
         /// <summary>
         /// Folder where the mod writes VanillaSpawners.Config.ini.
         /// </summary>
@@ -140,6 +144,10 @@ namespace VanillaSpawners
                     $@"; Logs blocked spawner activation checks.",
                     $@"; Useful for debugging, but noisy if players keep trying old spawners.",
                     $@"LogBlockedActivation=false",
+                    $@"",
+                    $@"[Hotkeys]",
+                    $@"; Reload this config while in-game:",
+                    $@"ReloadConfig=Ctrl+Shift+R",
                 };
 
                 // Write a default file.
@@ -157,6 +165,9 @@ namespace VanillaSpawners
             c.GenerateLootBlocks     = ini.GetBool("General", "GenerateLootBlocks",     c.GenerateLootBlocks);
             c.LogBlockedActivation   = ini.GetBool("General", "LogBlockedActivation",   c.LogBlockedActivation);
 
+            // [Hotkeys].
+            c.ReloadConfigHotkey = ini.GetString("Hotkeys", "ReloadConfig", c.ReloadConfigHotkey);
+
             return c;
         }
 
@@ -171,6 +182,8 @@ namespace VanillaSpawners
 
                 cfg.ApplyToStatics();
                 Active = cfg;
+
+                VSHotkeys.SetReloadBinding(cfg.ReloadConfigHotkey);
 
                 Log($"Config: {ConfigPath}.");
                 Log(
